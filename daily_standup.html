@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Daily Standup Dashboard</title>
+<style>
+:root{--bg:#0f172a;--card:#1e293b;--accent:#6366f1;--green:#22c55e;--amber:#f59e0b;--text:#e2e8f0}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding:1.5rem}
+.wrap{max-width:800px;margin:0 auto}
+.header{display:flex;justify-content:space-between;align-items:center;margin-bottom:2rem;flex-wrap:wrap;gap:1rem}
+.header h1{font-size:1.5rem}.header .date{color:#94a3b8;font-size:.9rem}
+.kpi-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:1rem;margin-bottom:2rem}
+.kpi{background:var(--card);border-radius:12px;padding:1.2rem;text-align:center}
+.kpi .label{font-size:.7rem;text-transform:uppercase;color:#94a3b8;letter-spacing:.5px;margin-bottom:.3rem}
+.kpi .val{font-size:1.8rem;font-weight:700}
+.kpi .delta{font-size:.75rem;margin-top:.2rem}
+.up{color:var(--green)}.dn{color:#ef4444}
+.section{background:var(--card);border-radius:12px;padding:1.5rem;margin-bottom:1.5rem}
+.section h2{font-size:1rem;color:#94a3b8;text-transform:uppercase;letter-spacing:1px;margin-bottom:1rem;font-weight:400}
+table{width:100%;border-collapse:collapse}
+th{text-align:left;font-size:.75rem;color:#64748b;text-transform:uppercase;padding:.5rem;border-bottom:1px solid #334155}
+td{padding:.6rem .5rem;border-bottom:1px solid rgba(51,65,85,.5);font-size:.9rem}
+.rank{color:var(--amber);font-weight:700;width:30px}
+.bar-sm{display:inline-block;height:6px;border-radius:3px;background:var(--accent)}
+.motivational{text-align:center;padding:2rem;font-style:italic;color:#94a3b8;font-size:1.1rem;line-height:1.6}
+.commitments{display:flex;flex-direction:column;gap:.8rem}
+.commit-item{display:flex;gap:.8rem;align-items:center}
+.commit-item input[type="text"]{flex:1;padding:.6rem;background:rgba(255,255,255,.05);border:1px solid #334155;border-radius:6px;color:var(--text);font-size:.9rem}
+.commit-item input[type="text"]:focus{outline:none;border-color:var(--accent)}
+.commit-item .rep-name{min-width:80px;font-weight:600;font-size:.85rem;color:var(--accent)}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="header">
+  <h1>📊 Daily Standup</h1>
+  <div class="date" id="today"></div>
+</div>
+
+<div class="kpi-row">
+  <div class="kpi"><div class="label">Calls Yesterday</div><div class="val">187</div><div class="delta up">↑ 12% vs avg</div></div>
+  <div class="kpi"><div class="label">Conversions</div><div class="val">14</div><div class="delta up">↑ 3 vs target</div></div>
+  <div class="kpi"><div class="label">Conversion Rate</div><div class="val">7.5%</div><div class="delta up">↑ 0.8%</div></div>
+  <div class="kpi"><div class="label">Revenue</div><div class="val">$8.2K</div><div class="delta dn">↓ 5% vs avg</div></div>
+  <div class="kpi"><div class="label">Pipeline</div><div class="val">$42K</div><div class="delta up">↑ steady</div></div>
+</div>
+
+<div class="section">
+  <h2>🏆 Yesterday's Leaderboard</h2>
+  <table>
+    <tr><th></th><th>Rep</th><th>Calls</th><th>Conv</th><th>Rate</th><th>Revenue</th></tr>
+    <tr><td class="rank">1</td><td>Carol</td><td>28</td><td>3</td><td>10.7%</td><td>$1,850</td></tr>
+    <tr><td class="rank">2</td><td>Ivan</td><td>25</td><td>2</td><td>8.0%</td><td>$1,400</td></tr>
+    <tr><td class="rank">3</td><td>Alice</td><td>24</td><td>2</td><td>8.3%</td><td>$1,200</td></tr>
+    <tr><td></td><td>Bob</td><td>22</td><td>2</td><td>9.1%</td><td>$950</td></tr>
+    <tr><td></td><td>Dave</td><td>21</td><td>1</td><td>4.8%</td><td>$800</td></tr>
+    <tr><td></td><td>Eve</td><td>20</td><td>1</td><td>5.0%</td><td>$650</td></tr>
+    <tr><td></td><td>Frank</td><td>18</td><td>1</td><td>5.6%</td><td>$550</td></tr>
+    <tr><td></td><td>Grace</td><td>16</td><td>1</td><td>6.3%</td><td>$450</td></tr>
+    <tr><td></td><td>Heidi</td><td>13</td><td>1</td><td>7.7%</td><td>$350</td></tr>
+  </table>
+</div>
+
+<div class="section">
+  <h2>🎯 Today's Commitments</h2>
+  <div class="commitments" id="commitments"></div>
+</div>
+
+<div class="section">
+  <h2>📈 This Week's Trend</h2>
+  <table>
+    <tr><th>Day</th><th>Calls</th><th>Conv</th><th>Rate</th><th>Revenue</th></tr>
+    <tr><td>Monday</td><td>172</td><td>11</td><td>6.4%</td><td>$7.1K</td></tr>
+    <tr><td>Tuesday</td><td>185</td><td>13</td><td>7.0%</td><td>$7.8K</td></tr>
+    <tr><td>Wednesday</td><td>187</td><td>14</td><td>7.5%</td><td>$8.2K</td></tr>
+    <tr><td>Thursday</td><td colspan="4" style="color:#64748b">— today —</td></tr>
+  </table>
+</div>
+
+<div class="motivational" id="motivation"></div>
+</div>
+
+<script>
+document.getElementById("today").textContent=new Date().toLocaleDateString("en-US",{weekday:"long",year:"numeric",month:"long",day:"numeric"});
+const reps=["Alice","Bob","Carol","Dave","Eve","Frank","Grace","Heidi","Ivan"];
+const c=document.getElementById("commitments");
+reps.forEach(function(name){
+  const div=document.createElement("div");div.className="commit-item";
+  div.innerHTML='<span class="rep-name">'+name+'</span><input type="text" placeholder="What are you committing to today?">';
+  c.appendChild(div);
+});
+const quotes=["Revenue is a byproduct of helping people solve problems.","The team that out-prepares always out-performs.","Every 'no' gets you closer to the next 'yes'.","Consistency beats intensity. Show up every day.","Your prospects don't care what you sell — they care what you solve."];
+document.getElementById("motivation").textContent='"'+quotes[Math.floor(Math.random()*quotes.length)]+'"';
+</script>
+</body>
+</html>

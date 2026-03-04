@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Oblique Strategies for Sales</title>
+<style>
+:root{--bg:#0f0f1a;--card:#1a1a2e;--accent:#00b4d8;--accent2:#e63946;--text:#e0e0e0}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Georgia',serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2rem}
+.card{background:var(--card);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:3rem 2.5rem;max-width:550px;width:100%;text-align:center;box-shadow:0 8px 40px rgba(0,0,0,.5);position:relative;overflow:hidden}
+.card::before{content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:conic-gradient(from 0deg,transparent,rgba(0,180,216,.05),transparent,rgba(230,57,70,.05),transparent);animation:spin 20s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.card-inner{position:relative;z-index:1}
+h1{font-size:1.3rem;color:#888;margin-bottom:2rem;font-weight:400;letter-spacing:2px;text-transform:uppercase}
+.prompt{font-size:1.6rem;line-height:1.6;min-height:120px;display:flex;align-items:center;justify-content:center;margin-bottom:2rem;font-style:italic;transition:opacity .4s}
+.prompt.fade{opacity:0}
+.btn{padding:1rem 2.5rem;background:transparent;color:var(--accent);border:2px solid var(--accent);border-radius:8px;font-size:1rem;cursor:pointer;font-family:inherit;transition:all .3s;letter-spacing:1px}
+.btn:hover{background:var(--accent);color:var(--bg)}
+.counter{margin-top:1.5rem;font-size:.8rem;color:#555}
+</style>
+</head>
+<body>
+<div class="card"><div class="card-inner">
+<h1>Oblique Strategies for Sales</h1>
+<div class="prompt" id="prompt">Click below to get a fresh perspective...</div>
+<button class="btn" id="btn" onclick="draw()">Draw a Card</button>
+<div class="counter" id="counter"></div>
+</div></div>
+<script>
+const prompts=[
+"What would this call look like if the prospect was your best friend?",
+"Describe your solution in one sentence a 5-year-old could understand.",
+"What is the one thing that would make this prospect say 'yes' today?",
+"How would you approach this if you knew you'd already won?",
+"What are you afraid to say? Say that.",
+"Listen for 60 seconds without planning your response.",
+"What does the prospect need that they haven't told you yet?",
+"Imagine you're the prospect. What would make YOU buy?",
+"What would happen if you asked for the sale right now?",
+"Which of your competitor's strengths is actually a weakness?",
+"What story would make this real for the prospect?",
+"Remove the jargon. Use only simple words.",
+"What would a completely different industry teach you about this deal?",
+"What's the smallest possible next step you could propose?",
+"Call the person you're most afraid to call.",
+"What assumption are you making that might be wrong?",
+"What would you do if the price didn't matter?",
+"What would you do if you only had one call left today?",
+"Focus entirely on what the prospect gains, not what they lose.",
+"What is the prospect's prospect worried about?",
+"Pretend you're recommending a competitor. What would you say?",
+"What would make this prospect tell their friends about you?",
+"How would you sell this if you couldn't use slides or documents?",
+"What question have you never asked a prospect before?",
+"What would make this the best call of their week?",
+"Reverse the power dynamic. Let them interview you.",
+"What would you do if you had unlimited confidence?",
+"Pause. Breathe. Now what matters most?",
+"What is the real problem behind the stated problem?",
+"What would a five-star review of this interaction say?",
+];
+let used=[];
+function draw(){
+  if(used.length>=prompts.length)used=[];
+  const avail=prompts.filter(function(_,i){return used.indexOf(i)===-1});
+  const idx=prompts.indexOf(avail[Math.floor(Math.random()*avail.length)]);
+  used.push(idx);
+  const el=document.getElementById("prompt");
+  el.classList.add("fade");
+  setTimeout(function(){el.textContent=prompts[idx];el.classList.remove("fade")},400);
+  document.getElementById("counter").textContent="Card "+used.length+" of "+prompts.length;
+}
+</script>
+</body>
+</html>

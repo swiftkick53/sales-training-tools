@@ -1,6 +1,3 @@
-# sales-training-tools
-Interactive gamified tools for sales team training and engagement
-[README.md](https://github.com/user-attachments/files/25749852/README.md)
 # Sales Training & Team Tools
 
 Interactive tools and gamified applications designed to engage sales teams, reinforce product knowledge, and build team culture. Built with HTML5, CSS, and JavaScript.

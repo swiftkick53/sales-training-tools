@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sales Script Practice Tool</title>
+<style>
+:root{--bg:#0f172a;--card:#1e293b;--accent:#8b5cf6;--green:#22c55e;--text:#e2e8f0}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding:2rem}
+.wrap{max-width:700px;margin:0 auto}
+h1{text-align:center;font-size:1.5rem;margin-bottom:.3rem;color:var(--accent)}
+.sub{text-align:center;color:#94a3b8;margin-bottom:2rem;font-size:.9rem}
+.scenarios{display:flex;flex-direction:column;gap:.8rem;margin-bottom:2rem}
+.scenario-btn{background:var(--card);border:2px solid transparent;border-radius:10px;padding:1rem 1.2rem;cursor:pointer;text-align:left;transition:all .2s;color:var(--text)}
+.scenario-btn:hover{border-color:var(--accent)}
+.scenario-btn.active{border-color:var(--accent);background:rgba(139,92,246,.1)}
+.scenario-btn .title{font-weight:600;margin-bottom:.2rem}.scenario-btn .diff{font-size:.75rem;color:#94a3b8}
+.practice-area{display:none;background:var(--card);border-radius:12px;padding:2rem;margin-bottom:1.5rem}
+.practice-area.show{display:block}
+.situation{background:rgba(139,92,246,.08);border-left:3px solid var(--accent);padding:1rem;border-radius:0 8px 8px 0;margin-bottom:1rem;font-size:.95rem;line-height:1.5}
+.situation strong{color:var(--accent)}
+.goal{font-size:.85rem;color:#94a3b8;margin-bottom:1rem}
+textarea{width:100%;min-height:150px;padding:1rem;background:rgba(255,255,255,.05);border:1px solid #334155;border-radius:8px;color:var(--text);font-size:1rem;font-family:inherit;resize:vertical}
+textarea:focus{outline:none;border-color:var(--accent)}
+.char-count{text-align:right;font-size:.75rem;color:#64748b;margin-top:.3rem}
+.btn-row{display:flex;gap:1rem;margin-top:1rem;flex-wrap:wrap}
+.btn{padding:.7rem 1.5rem;border-radius:8px;font-size:.9rem;cursor:pointer;border:none;font-family:inherit;transition:all .2s}
+.btn-primary{background:var(--accent);color:#fff}.btn-primary:hover{opacity:.9}
+.btn-secondary{background:transparent;color:var(--accent);border:1px solid var(--accent)}.btn-secondary:hover{background:rgba(139,92,246,.1)}
+.feedback-box{display:none;background:var(--card);border-radius:12px;padding:2rem;margin-bottom:1.5rem}
+.feedback-box.show{display:block}
+.feedback-box h3{color:var(--green);margin-bottom:1rem}
+.tip{background:rgba(34,197,94,.08);border-left:3px solid var(--green);padding:.8rem 1rem;border-radius:0 8px 8px 0;margin-bottom:.8rem;font-size:.9rem;line-height:1.5}
+.checklist{list-style:none;margin-top:1rem}
+.checklist li{padding:.4rem 0;font-size:.9rem}
+.checklist li::before{content:'✓ ';color:var(--green);font-weight:700}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>🎯 Sales Script Practice</h1>
+<p class="sub">Select a scenario, write your response, get coaching tips</p>
+
+<div class="scenarios" id="scenarios"></div>
+<div class="practice-area" id="practice">
+  <div class="situation" id="situation"></div>
+  <div class="goal" id="goal"></div>
+  <textarea id="response" placeholder="Write your sales response here..."></textarea>
+  <div class="char-count"><span id="chars">0</span> characters</div>
+  <div class="btn-row">
+    <button class="btn btn-primary" onclick="getFeedback()">Get Feedback</button>
+    <button class="btn btn-secondary" onclick="clearResponse()">Clear</button>
+  </div>
+</div>
+<div class="feedback-box" id="feedbackBox">
+  <h3>📝 Coaching Feedback</h3>
+  <div id="feedbackContent"></div>
+</div>
+</div>
+
+<script>
+const scenarios=[
+  {title:"Handle Price Objection",situation:"A contractor says: <strong>'Your pricing is 20% higher than the other platform I'm looking at. Why should I pay more?'</strong>",goal:"Desired outcome: Reframe the conversation from price to value and ROI.",diff:"Medium",tips:["Acknowledge their concern without being defensive","Quantify the ROI — how much revenue do contractors typically earn through the platform?","Use social proof — mention other contractors' success","Ask what matters most to them beyond price"],checklist:["Acknowledged the objection","Presented specific value/ROI numbers","Used social proof or testimonial","Asked a follow-up question"]},
+  {title:"Cold Outreach Opening",situation:"You're calling a contractor who has never heard of HomeStars. They answer the phone and say: <strong>'Yeah, what do you want?'</strong>",goal:"Desired outcome: Get 30 seconds of their attention and qualify interest.",diff:"Hard",tips:["Lead with their pain point, not your product","Keep it under 20 seconds before asking a question","Use their name if you have it","Sound human, not scripted"],checklist:["Led with value, not product features","Kept intro under 30 seconds","Asked a qualifying question","Sounded natural and confident"]},
+  {title:"Subscription Renewal — Cancel Request",situation:"A contractor who's been on the platform for 8 months says: <strong>'I want to cancel. I'm not getting enough leads to justify the cost.'</strong>",goal:"Desired outcome: Understand the real issue and present a retention offer.",diff:"Medium",tips:["Don't panic — ask questions first","Find out how many leads they've received and their close rate","Explore whether the issue is lead quality, lead volume, or their conversion process","Present a solution before offering any discount"],checklist:["Asked probing questions before offering solutions","Identified the root cause","Offered a specific action plan","Showed empathy without being desperate"]},
+  {title:"Upsell to Premium",situation:"A contractor on the basic plan is having good results. They say: <strong>'Things are going well, I'm pretty happy with what I have.'</strong>",goal:"Desired outcome: Create desire for the premium tier by showing unrealized potential.",diff:"Easy",tips:["Congratulate their success genuinely","Use their own data to show what they're missing","Paint a picture of what premium would look like with their current momentum","Create urgency with a limited-time offer if available"],checklist:["Acknowledged their success","Used their data to build the case","Described specific premium benefits","Created a reason to act now"]},
+  {title:"Competitor Comparison",situation:"A prospect says: <strong>'I'm also looking at [competitor]. They seem to offer the same thing. What makes you different?'</strong>",goal:"Desired outcome: Differentiate without bashing the competitor.",diff:"Hard",tips:["Never trash-talk the competitor","Focus on what you do best, not what they do worst","Use specific numbers or case studies","Turn it into a discovery question about what matters to them"],checklist:["Stayed positive about the competitor","Highlighted unique differentiators","Used specific proof points","Asked what matters most to them"]},
+];
+
+const sc=document.getElementById("scenarios");
+scenarios.forEach(function(s,i){
+  const btn=document.createElement("button");btn.className="scenario-btn";
+  btn.innerHTML='<div class="title">'+s.title+'</div><div class="diff">Difficulty: '+s.diff+'</div>';
+  btn.onclick=function(){selectScenario(i)};
+  sc.appendChild(btn);
+});
+
+let current=-1;
+function selectScenario(i){
+  current=i;const s=scenarios[i];
+  document.querySelectorAll(".scenario-btn").forEach(function(b,j){b.className="scenario-btn"+(j===i?" active":"")});
+  document.getElementById("situation").innerHTML=s.situation;
+  document.getElementById("goal").textContent=s.goal;
+  document.getElementById("practice").className="practice-area show";
+  document.getElementById("feedbackBox").className="feedback-box";
+  document.getElementById("response").value="";
+  document.getElementById("chars").textContent="0";
+}
+
+document.getElementById("response").addEventListener("input",function(){
+  document.getElementById("chars").textContent=this.value.length;
+});
+
+function getFeedback(){
+  if(current<0)return;
+  const text=document.getElementById("response").value.trim();
+  if(text.length<20){alert("Write at least a few sentences to get useful feedback.");return}
+  const s=scenarios[current];
+  let html="";
+  s.tips.forEach(function(t){html+='<div class="tip">'+t+'</div>'});
+  html+='<h4 style="color:#94a3b8;margin-top:1.5rem;margin-bottom:.5rem">Key Points Checklist:</h4><ul class="checklist">';
+  s.checklist.forEach(function(c){html+="<li>"+c+"</li>"});
+  html+="</ul>";
+  html+='<p style="margin-top:1rem;font-size:.85rem;color:#94a3b8">Try rewriting your response incorporating these tips, then compare your two versions.</p>';
+  document.getElementById("feedbackContent").innerHTML=html;
+  document.getElementById("feedbackBox").className="feedback-box show";
+}
+
+function clearResponse(){
+  document.getElementById("response").value="";
+  document.getElementById("chars").textContent="0";
+  document.getElementById("feedbackBox").className="feedback-box";
+}
+</script>
+</body>
+</html>

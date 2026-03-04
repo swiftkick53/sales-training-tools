@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Maple Syrup Millionaires — Sales Trivia</title>
+<style>
+:root{--maple:#C41E3A;--dk:#8B0000;--gold:#FFD700;--bg:#1a1a2e;--card:#16213e;--txt:#e0e0e0;--ok:#2ecc71;--bad:#e74c3c}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;display:flex;flex-direction:column;align-items:center}
+.hdr{text-align:center;padding:2rem 1rem 1rem;width:100%;background:linear-gradient(135deg,var(--dk),var(--maple))}
+.hdr h1{font-size:1.8rem;color:#fff}.hdr p{color:#ffcccc;font-size:.9rem;margin-top:.3rem}
+.stats{display:flex;gap:1.5rem;justify-content:center;padding:1rem;flex-wrap:wrap}
+.stat .l{font-size:.7rem;text-transform:uppercase;color:#888}.stat .v{font-size:1.4rem;font-weight:700;color:var(--gold)}
+.xpw{width:90%;max-width:500px;height:8px;background:#333;border-radius:4px;margin:0 auto 1.5rem}
+.xpb{height:100%;background:var(--gold);border-radius:4px;transition:width .5s}
+.cnt{width:90%;max-width:600px;padding-bottom:3rem}
+.qc{background:var(--card);border-radius:12px;padding:2rem;box-shadow:0 4px 20px rgba(0,0,0,.3)}
+.qn{font-size:.8rem;color:#888;margin-bottom:.5rem}.qt{font-size:1.15rem;line-height:1.5;margin-bottom:1.5rem}
+.badge{display:inline-block;font-size:.7rem;padding:2px 8px;border-radius:10px;margin-bottom:1rem;text-transform:uppercase}
+.b-easy{background:#2ecc71;color:#000}.b-medium{background:#f39c12;color:#000}.b-hard{background:#e74c3c;color:#fff}
+.opts{display:flex;flex-direction:column;gap:.75rem}
+.opt{background:rgba(255,255,255,.05);border:2px solid rgba(255,255,255,.1);border-radius:8px;padding:1rem;cursor:pointer;transition:all .2s;font-size:1rem}
+.opt:hover{border-color:var(--gold);background:rgba(255,215,0,.08)}
+.opt.ok{border-color:var(--ok);background:rgba(46,204,113,.15)}.opt.bad{border-color:var(--bad);background:rgba(231,76,60,.15)}.opt.dis{pointer-events:none;opacity:.6}
+.fb{text-align:center;padding:1rem;font-size:1.1rem;border-radius:8px;margin-top:1rem;display:none}
+.fb.show{display:block}.fb.fok{background:rgba(46,204,113,.15);color:var(--ok)}.fb.fbad{background:rgba(231,76,60,.15);color:var(--bad)}
+.nbtn{display:none;margin:1.5rem auto 0;padding:.8rem 2rem;background:var(--maple);color:#fff;border:none;border-radius:8px;font-size:1rem;cursor:pointer}
+.nbtn:hover{background:var(--dk)}.nbtn.show{display:block}
+.popup{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(0);font-size:3rem;transition:transform .3s;pointer-events:none;z-index:100}
+.popup.pop{transform:translate(-50%,-50%) scale(1)}
+.res{background:var(--card);border-radius:12px;padding:2rem;text-align:center;display:none}
+.res h2{color:var(--gold);margin-bottom:1rem}.res .fs{font-size:2.5rem;font-weight:700;margin:1rem 0}
+.rbtn{padding:.8rem 2rem;background:var(--maple);color:#fff;border:none;border-radius:8px;font-size:1rem;cursor:pointer;margin-top:1rem}
+</style>
+</head>
+<body>
+<div class="hdr"><h1>🍁 Maple Syrup Millionaires</h1><p>HomeStars Canada — Sales Knowledge Challenge</p></div>
+<div class="stats">
+  <div class="stat"><div class="l">XP</div><div class="v" id="xp">0</div></div>
+  <div class="stat"><div class="l">Level</div><div class="v" id="lv">1</div></div>
+  <div class="stat"><div class="l">Streak</div><div class="v" id="sk">0 🔥</div></div>
+  <div class="stat"><div class="l">Score</div><div class="v" id="sc">0/0</div></div>
+</div>
+<div class="xpw"><div class="xpb" id="xpB" style="width:0%"></div></div>
+<div class="cnt">
+  <div class="qc" id="qC">
+    <div class="qn" id="qN"></div><span class="badge" id="dB"></span>
+    <div class="qt" id="qT"></div><div class="opts" id="opts"></div>
+    <div class="fb" id="fb"></div>
+    <button class="nbtn" id="nB" onclick="next()">Next Question →</button>
+  </div>
+  <div class="res" id="res"><h2>Challenge Complete!</h2><div class="fs" id="fS"></div><p id="fM"></p>
+    <button class="rbtn" onclick="restart()">Play Again 🍁</button></div>
+</div>
+<div class="popup" id="sP"></div>
+<script>
+const Q=[
+{q:"What percentage of Canadian homeowners plan a renovation in the next 12 months?",o:["15-20%","25-35%","40-55%","60-70%"],c:2,d:"easy"},
+{q:"#1 factor homeowners consider when choosing a contractor?",o:["Price","Online reviews","Referral from friend","Years in business"],c:1,d:"easy"},
+{q:"Average cost of a kitchen renovation in Canada?",o:["$5k-$10k","$15k-$30k","$25k-$50k","$50k-$100k"],c:2,d:"medium"},
+{q:"Which season sees highest demand for contractor services?",o:["Winter","Spring","Summer","Fall"],c:1,d:"easy"},
+{q:"What % of HomeStars users hire within 30 days of searching?",o:["20%","35%","50%","65%"],c:2,d:"medium"},
+{q:"Best way to handle a 'price is too high' objection?",o:["Lower the price","Explain value and ROI","Offer a discount","Ignore it"],c:1,d:"easy"},
+{q:"What is F98 revenue?",o:["Revenue from first 98 days","Retention revenue metric","Top 98 accounts","Future 98-day forecast"],c:1,d:"medium"},
+{q:"Which province has the largest home renovation market?",o:["British Columbia","Alberta","Ontario","Quebec"],c:2,d:"medium"},
+{q:"Ideal call-to-close ratio for subscription winback?",o:["5:1","10:1","15:1","20:1"],c:1,d:"hard"},
+{q:"Why is retention weighted more heavily in our comp plan?",o:["Retention is easier","Costs 5-10x less than acquisition","Targets are unrealistic","Regulatory requirement"],c:1,d:"medium"},
+{q:"What does Tier 1 prioritize in our scoring system?",o:["Largest company","Recent engagement + high LTV","Geographic proximity","Industry vertical"],c:1,d:"hard"},
+{q:"How many prospects on a typical daily call sheet?",o:["50-75","100-150","150-200+","300+"],c:2,d:"easy"},
+{q:"Primary benefit of territory-specific goals?",o:["Simpler admin","Fair targets for market maturity","Lower payouts","Easier to game"],c:1,d:"medium"},
+{q:"Knowledge retention improvement from our trivia app?",o:["10%","25%","40%","60%"],c:2,d:"hard"},
+{q:"Campaign type with highest conversion rate?",o:["Cold outreach","Subscription Winback","Expired with Payment","Acquisition Winback"],c:1,d:"medium"},
+];
+let cur=0,xp=0,sk=0,ok=0,lv=1;
+function render(){if(cur>=Q.length){showRes();return}const q=Q[cur];document.getElementById("qN").textContent="Question "+(cur+1)+" of "+Q.length;document.getElementById("qT").textContent=q.q;const b=document.getElementById("dB");b.textContent=q.d;b.className="badge b-"+q.d;const o=document.getElementById("opts");o.innerHTML="";q.o.forEach(function(t,i){const d=document.createElement("div");d.className="opt";d.textContent=t;d.onclick=function(){pick(i)};o.appendChild(d)});document.getElementById("fb").className="fb";document.getElementById("nB").className="nbtn"}
+function pick(i){const q=Q[cur];document.querySelectorAll(".opt").forEach(function(o,j){o.classList.add("dis");if(j===q.c)o.classList.add("ok");if(j===i&&i!==q.c)o.classList.add("bad")});const fb=document.getElementById("fb");if(i===q.c){ok++;sk++;xp+=10+(sk>1?sk*2:0);fb.textContent=sk>2?"🔥 "+sk+"-streak! +"+(10+sk*2)+" XP":"✅ Correct! +10 XP";fb.className="fb fok show";if(sk>=3)pop(sk)}else{sk=0;fb.textContent="❌ Answer: "+q.o[q.c];fb.className="fb fbad show"}lv=Math.floor(xp/100)+1;document.getElementById("xp").textContent=xp;document.getElementById("lv").textContent=lv;document.getElementById("sk").textContent=sk+" 🔥";document.getElementById("sc").textContent=ok+"/"+(cur+1);document.getElementById("xpB").style.width=(xp%100)+"%";document.getElementById("nB").className="nbtn show"}
+function next(){cur++;render()}
+function pop(n){const e=document.getElementById("sP");e.textContent="🔥 "+n+"x Streak!";e.className="popup pop";setTimeout(function(){e.className="popup"},1200)}
+function showRes(){document.getElementById("qC").style.display="none";document.getElementById("res").style.display="block";const p=Math.round(ok/Q.length*100);document.getElementById("fS").textContent=ok+"/"+Q.length+" ("+p+"%)";document.getElementById("fM").textContent=(p>=80?"🏆 Outstanding! True Maple Syrup Millionaire!":p>=60?"👏 Great job!":"💪 Good effort — try again!")+"\nXP: "+xp+" | Level: "+lv}
+function restart(){cur=0;xp=0;sk=0;ok=0;lv=1;document.getElementById("xp").textContent="0";document.getElementById("lv").textContent="1";document.getElementById("sk").textContent="0 🔥";document.getElementById("sc").textContent="0/0";document.getElementById("xpB").style.width="0%";document.getElementById("qC").style.display="block";document.getElementById("res").style.display="none";render()}
+render();
+</script>
+</body>
+</html>

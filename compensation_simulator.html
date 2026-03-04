@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Compensation Simulator</title>
+<style>
+:root{--bg:#0f172a;--card:#1e293b;--accent:#38bdf8;--green:#22c55e;--gold:#fbbf24;--text:#e2e8f0}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding:2rem}
+.wrap{max-width:700px;margin:0 auto}
+h1{text-align:center;font-size:1.6rem;margin-bottom:.5rem;color:var(--accent)}
+.sub{text-align:center;color:#94a3b8;margin-bottom:2rem;font-size:.9rem}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:2rem}
+@media(max-width:500px){.grid{grid-template-columns:1fr}}
+.field label{display:block;font-size:.8rem;color:#94a3b8;margin-bottom:.3rem;text-transform:uppercase;letter-spacing:.5px}
+.field select,.field input{width:100%;padding:.8rem;background:var(--card);color:var(--text);border:1px solid #334155;border-radius:8px;font-size:1rem}
+.field input:focus,.field select:focus{outline:none;border-color:var(--accent)}
+.results-card{background:var(--card);border-radius:12px;padding:2rem;margin-bottom:1.5rem}
+.results-card h2{font-size:1.1rem;color:#94a3b8;margin-bottom:1rem;text-transform:uppercase;letter-spacing:1px;font-weight:400}
+.big-num{font-size:2.8rem;font-weight:700;color:var(--green);text-align:center;margin:1rem 0}
+.breakdown{display:flex;justify-content:space-around;flex-wrap:wrap;gap:1rem;margin-top:1rem}
+.bk-item{text-align:center}
+.bk-item .label{font-size:.75rem;color:#94a3b8;text-transform:uppercase}.bk-item .val{font-size:1.3rem;font-weight:600;margin-top:.2rem}
+.bar-wrap{margin-top:1.5rem}
+.bar-label{display:flex;justify-content:space-between;font-size:.8rem;color:#94a3b8;margin-bottom:.3rem}
+.bar-bg{height:12px;background:#334155;border-radius:6px;overflow:hidden}
+.bar-fill{height:100%;border-radius:6px;transition:width .5s}
+.bar-ret .bar-fill{background:var(--accent)}.bar-acq .bar-fill{background:var(--gold)}
+.annual{text-align:center;margin-top:1.5rem;padding:1.5rem;background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.2);border-radius:12px}
+.annual .label{font-size:.85rem;color:#94a3b8}.annual .val{font-size:2rem;font-weight:700;color:var(--green);margin-top:.3rem}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>💰 Compensation Simulator</h1>
+<p class="sub">See exactly how your commission is calculated</p>
+<div class="grid">
+  <div class="field"><label>Territory</label><select id="territory" onchange="calc()"><option>East</option><option>West</option><option>Central</option></select></div>
+  <div class="field"><label>Period</label><select id="period" onchange="calc()"><option>Monthly</option><option>Weekly</option></select></div>
+  <div class="field"><label>Retention Revenue ($)</label><input type="number" id="ret" value="48000" oninput="calc()"></div>
+  <div class="field"><label>Acquisition Revenue ($)</label><input type="number" id="acq" value="25000" oninput="calc()"></div>
+</div>
+
+<div class="results-card">
+  <h2>Your Commission</h2>
+  <div class="big-num" id="total">$0.00</div>
+  <div class="breakdown">
+    <div class="bk-item"><div class="label">Retention</div><div class="val" id="retC" style="color:var(--accent)">$0</div></div>
+    <div class="bk-item"><div class="label">Acquisition</div><div class="val" id="acqC" style="color:var(--gold)">$0</div></div>
+    <div class="bk-item"><div class="label">Base Rate</div><div class="val" id="rate">8%</div></div>
+  </div>
+  <div class="bar-wrap bar-ret">
+    <div class="bar-label"><span>Retention Goal</span><span id="retPct">0%</span></div>
+    <div class="bar-bg"><div class="bar-fill" id="retBar" style="width:0%"></div></div>
+  </div>
+  <div class="bar-wrap bar-acq" style="margin-top:.8rem">
+    <div class="bar-label"><span>Acquisition Goal</span><span id="acqPct">0%</span></div>
+    <div class="bar-bg"><div class="bar-fill" id="acqBar" style="width:0%"></div></div>
+  </div>
+</div>
+
+<div class="annual">
+  <div class="label">Projected Annual Earnings (at this pace)</div>
+  <div class="val" id="annual">$0</div>
+</div>
+</div>
+
+<script>
+const plans={
+  East:{retW:.6,acqW:.4,retGoal:50000,acqGoal:30000,rate:.08},
+  West:{retW:.6,acqW:.4,retGoal:45000,acqGoal:28000,rate:.08},
+  Central:{retW:.6,acqW:.4,retGoal:48000,acqGoal:32000,rate:.08}
+};
+function fmt(n){return"$"+n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2})}
+function calc(){
+  const t=document.getElementById("territory").value;
+  const p=plans[t];
+  const ret=parseFloat(document.getElementById("ret").value)||0;
+  const acq=parseFloat(document.getElementById("acq").value)||0;
+  const isWeekly=document.getElementById("period").value==="Weekly";
+  const mult=isWeekly?1/4.33:1;
+  const retC=ret*p.rate*p.retW*mult;
+  const acqC=acq*p.rate*p.acqW*mult;
+  const total=retC+acqC;
+  document.getElementById("total").textContent=fmt(total);
+  document.getElementById("retC").textContent=fmt(retC);
+  document.getElementById("acqC").textContent=fmt(acqC);
+  document.getElementById("rate").textContent=(p.rate*100)+"%";
+  const retPct=Math.min(150,Math.round(ret/(p.retGoal*mult)*100));
+  const acqPct=Math.min(150,Math.round(acq/(p.acqGoal*mult)*100));
+  document.getElementById("retPct").textContent=retPct+"%";
+  document.getElementById("acqPct").textContent=acqPct+"%";
+  document.getElementById("retBar").style.width=Math.min(100,retPct)+"%";
+  document.getElementById("acqBar").style.width=Math.min(100,acqPct)+"%";
+  const annualMult=isWeekly?52:12;
+  document.getElementById("annual").textContent=fmt(total*annualMult);
+}
+calc();
+</script>
+</body>
+</html>
